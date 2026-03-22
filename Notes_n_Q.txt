@@ -1,0 +1,150 @@
+Kontraktion: summerer over et index, for eksempel hvis man har A_ij og B_jk, så summerer man over j, men i og k er stadig frie. Det bliver til en ny matrix a samme størrelse.
+
+Dobbelt kontraktion: hvor man summerer for begge indexer og sætter A_ij og B_ij, så det vil blive en scalar.
+
+Shape functions: er ligesom bare en made at beskrive deformationen ind i mellem nodes, ved at sige "jeg ved hvad den er præcis i de punkter (nodes) og så sige, ud fra det kan jeg jo approximere hvordan det ser ud imellem nodesne med en function, som så er shape functionen.
+
+Gauss points: er en made at integrere numerisk inde i det felt som shape functions definerer. Så ved at have et vist antal gauss punkter hvori jeg udregner diverse værdier, man integrerer over elementets rum, ikke “alle andre steder” direkte — det er en approximation, men ekstremt præcis for polynomielle felter.
+
+Iso-parametriske elementer: Man burger de samme shape functions til at udregne ting som tøjninger (dit field) tsom man gør til at udregne geometrien af elementet.
+
+Non-isoparametric elements: man bruger forskellige udtryk til at udregne de forskellige fields, fra de shape functions man bruger til geometrien.
+
+Locking Phenomena: Det er når de shape functions man bruger til at beskrive elementet ikke kan følge med den deformation man fysisk forventer - så elementet bliver kunstigt meget mere stift end det er i virkeligheden. Det kan ofte løses ved at bruge mere high order functions eller elements.
+
+tuple: Immutable objects. Hver element kan være en ny type information.
+
+Tensor Orders: En tensor order 0  er en vector, order 2 er en matrix og order 4 er en matrix med matricer indeni
+
+
+Funktioner:
+
+
+Tensor {order,dim,T} -  Går kun op til 3 dimensioner
+SymmetricTensor{order,dim,T} - virker kun i order 2,4
+
+
+one(tensor) = identitets matricer
+ones(tensor) = matricer med 1-taller på alle felter
+Kan også kombineres til at lave 4 2x2 identitetsmatricer inde i en anden matrice, således: ones(Tensor{2,2}, 2, 2)
+
+
+
+
+
+
+
+Questions
+What is the correct approach to calculating stresses when i have 2 different cellvalues with different amounts of quadraturepoints ?
+	Right now i am finding the volumetric stress and then adding it to each quadrature point in the deviatoric part, assumming that it is the same for the entire cell.
+
+
+Ferrite.IdentityMapping:
+Notes on SimpleCellValues Function
+
+Purpose:
+  - Creates a SimpleCellValues object for a single finite element.
+  - Precomputes all shape function values, gradients, and quadrature information.
+  - Acts as a data container to make FEM assembly efficient.
+
+Inputs:
+  - qr::QuadratureRule     : Quadrature rule (points and weights) for integration.
+  - ip_fun::Interpolation  : Interpolation object for the solution field.
+  - ip_geo::Interpolation  : Interpolation object for the element geometry.
+
+Steps:
+
+1. Determine spatial dimension:
+   - dim = Ferrite.getrefdim(ip_fun)
+   - Gets the reference dimension (1D, 2D, 3D) of the element.
+
+2. Get quadrature points and weights:
+   - weights = Ferrite.getweights(qr)
+   - n_qpoints = length(weights)
+   - T = eltype(weights) (data type, usually Float64)
+
+3. Allocate arrays for function interpolation:
+   - n_func_basefuncs = getnbasefunctions(ip_fun)
+   - N = zeros(T, n_func_basefuncs, n_qpoints)       # Shape function values
+   - dNdx = zeros(Vec{dim,T}, n_func_basefuncs, n_qpoints)  # Physical gradients (to be computed later)
+   - dNdξ = zeros(Vec{dim,T}, n_func_basefuncs, n_qpoints)  # Reference gradients
+
+4. Allocate arrays for geometric interpolation:
+   - n_geom_basefuncs = getnbasefunctions(ip_geo)
+   - M = zeros(T, n_geom_basefuncs, n_qpoints)       # Geometric shape values
+   - dMdξ = zeros(Vec{dim,T}, n_geom_basefuncs, n_qpoints)  # Geometric reference gradients
+
+5. Precompute shape function values and gradients at quadrature points:
+   - Loop over quadrature points:
+       for (qp, ξ) in pairs(Ferrite.getpoints(qr))
+   - For each solution shape function i:
+       - dNdξ[i, qp], N[i, qp] = Ferrite.reference_shape_gradient_and_value(ip_fun, ξ, i)
+   - For each geometric shape function j:
+       - dMdξ[j, qp], M[j, qp] = Ferrite.reference_shape_gradient_and_value(ip_geo, ξ, j)
+
+6. Initialize detJdV:
+   - detJdV = zeros(T, n_qpoints)
+   - Will store the physical quadrature weights after reinit! is called.
+
+7. Return:
+   - SimpleCellValues(N, dNdξ, dNdx, M, dMdξ, weights, detJdV)
+
+---
+
+Data stored in SimpleCellValues:
+  1. Shape function values (N)
+  2. Shape function gradients in reference coordinates (dNdξ)
+  3. Shape function gradients in physical coordinates (dNdx, initially zero)
+  4. Geometric mapping info (M, dMdξ)
+  5. Quadrature information (weights, detJdV, initially zero)
+
+Use in FEM:
+  - During assembly, loop over elements and quadrature points.
+  - Use precomputed N, dNdξ, dNdx, M, dMdξ, and quadrature weights to compute:
+      - Stiffness matrices
+      - Mass matrices
+      - Residual vectors
+  - Efficient because all repetitive calculations are precomputed once.
+
+Relation to Ferrite.IdentityMapping:
+  - SimpleCellValues works with standard Ferrite types and functions.
+  - Can be reinitialized for current cell geometry using reinit! to fill dNdx and detJdV.
+
+
+=== Tuple Unpacking in Julia ===
+
+1. Definition:
+   - Tuple unpacking allows you to assign multiple values returned by a function (or present in a tuple) to multiple variables in a single line.
+   - Syntax:
+       var1, var2, ..., varN = function_that_returns_tuple(...)
+
+2. Example 1: Simple numbers
+   function minmax(x, y)
+       return (min(x, y), max(x, y))
+   end
+
+   a, b = minmax(10, 25)
+   println(a)  # 10
+   println(b)  # 25
+
+   - Here, minmax returns a tuple (min, max)
+   - a gets first element, b gets second element
+
+3. Example 2: FEM context
+   dNdξ[i, qp], N[i, qp] = Ferrite.reference_shape_gradient_and_value(ip_fun, ξ, i)
+
+   - Ferrite.reference_shape_gradient_and_value returns a tuple:
+       (gradient_of_shape_function, value_of_shape_function)
+   - dNdξ[i, qp] gets gradient
+   - N[i, qp] gets value
+
+4. Notes:
+   - The number of variables on the left must match the number of elements in the tuple
+   - You can give any names you like to the variables
+   - Works with any iterable that returns tuples (arrays with indices, dictionaries, etc.)
+
+
+
+What does the word dispatch mean in a Julia context?
+i can't seem to find a precise explanation.
+ 		Example "The last step is then to dispatch reinit! for our SimpleCellValues to calculate the cached values dNdx and detJdV for the current cell according to the theory for IdentityMapping above."
