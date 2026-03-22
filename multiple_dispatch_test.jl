@@ -77,3 +77,8 @@ end
 
 u_standard = JespersPackage.run_simulation(dh, scheme_standard, mat, ch, getfacetset(grid, "rightt"), facetvalues, traction)
 u_reduced  = JespersPackage.run_simulation(dh, scheme_reduced,  mat, ch, getfacetset(grid, "rightt"), facetvalues, traction)
+#Test to see how to push code
+foo = function()
+    2+2
+    return(4)
+end
