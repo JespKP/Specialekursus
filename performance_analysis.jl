@@ -2,7 +2,7 @@ using BenchmarkTools
 using Cthulhu
 
 # Profiling 
-using Ferrite, SparseArrays, JespersPackage
+using Ferrite, SparseArrays, jp_test_package
 function run_reduced_simulation(nel_y)
     L = 20.0   # Length [mm]
 
@@ -42,11 +42,11 @@ function run_reduced_simulation(nel_y)
     Emod = 200.0e3  # Young's modulus [MPa]
 
     nu = 0.3  # Poisson's ratio
-    mat = JespersPackage.plane_strain_tensors(Emod, nu)
+    mat = jp_test_package.plane_strain_tensors(Emod, nu)
     # Reduced integration - everything identical except the scheme
     scheme_reduced = ReducedIntegration(cellvalues_dil, cellvalues_dev)
 
-    u_reduced  = JespersPackage.run_simulation(dh, scheme_reduced,  mat, ch, getfacetset(grid, "rightt"), facetvalues, traction)
+    u_reduced  = jp_test_package.run_simulation(dh, scheme_reduced,  mat, ch, getfacetset(grid, "rightt"), facetvalues, traction)
 
     VTKGridFile("reduced_integration", dh) do vtk
         write_solution(vtk, dh, u_reduced)
@@ -74,7 +74,7 @@ function set_up_cellassembly()
 
     Emod = 200.0e3
     nu   = 0.3
-    mat  = JespersPackage.plane_strain_tensors(Emod, nu)
+    mat  = jp_test_package.plane_strain_tensors(Emod, nu)
 
     scheme_red = ReducedIntegration(cv_dil, cv_dev)
 
@@ -91,14 +91,14 @@ end
 
 
 ke_red, scheme_red, mat = set_up_cellassembly()
-JespersPackage.assemble_cell!(ke_red, scheme_red, mat)
+jp_test_package.assemble_cell!(ke_red, scheme_red, mat)
 
-@time JespersPackage.assemble_cell!(ke_red, scheme_red, mat);
+@time jp_test_package.assemble_cell!(ke_red, scheme_red, mat);
 
-@btime JespersPackage.assemble_cell!($ke_red, $scheme_red, $mat);
+@btime jp_test_package.assemble_cell!($ke_red, $scheme_red, $mat);
 
-@code_warntype JespersPackage.assemble_cell!(ke_red, scheme_red, mat);
+@code_warntype jp_test_package.assemble_cell!(ke_red, scheme_red, mat)
 
 
 # this comes from Cthulhu
-@descend JespersPackage.assemble_cell!(ke_red, scheme_red, mat);
+@descend jp_test_package.assemble_cell!(ke_red, scheme_red, mat);
