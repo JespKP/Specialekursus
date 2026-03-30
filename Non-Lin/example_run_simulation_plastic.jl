@@ -13,7 +13,7 @@ function run_example(nx::Int, ny::Int)
     qr = QuadratureRule{RefQuadrilateral}(2)
     qr_face = FacetQuadratureRule{RefQuadrilateral}(1)
 
-    cellvalues = CellValues(qr, ip)
+    cellvalues = CellValues(qr, ip)s
     facetvalues = FacetValues(qr_face, ip)
 
     dh = DofHandler(grid)

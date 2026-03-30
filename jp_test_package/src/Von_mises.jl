@@ -10,6 +10,7 @@ function von_mises_from_plane_strain_3d(
     C2::SymmetricTensor{4, 2, T2};
     return_components=true,
 ) where {T1, T2}
+    # Plane-strain 2D tensor as (σ_11, σ_12=σ_21, σ_22)
     eps2 = SymmetricTensor{2, 2}((eps3[1, 1], eps3[2, 2], eps3[1, 2]))
     sigma2 = C2 ⊡ eps2
 

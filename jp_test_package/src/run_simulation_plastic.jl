@@ -2,7 +2,7 @@ function run_simulation_plastic(dh, scheme, mat::LinearElasticMaterial, ch,
                                 facetset, facetvalues, total_traction,
                                 n_increments::Int, h::Float64, σ_y0::Float64;
                                 imax::Int     = 20,
-                                eps_stop::Float64 = 1e-8)
+                                eps_stop::Float64 = 1e-6)
 
     nqp    = getnquadpoints(get_primary_cv(scheme))
     ncells = getncells(dh.grid)
@@ -68,7 +68,7 @@ function run_simulation_plastic(dh, scheme, mat::LinearElasticMaterial, ch,
 
             # 8. Update displacements  Dⁿᵢ₊₁ = Dⁿᵢ + ΔDⁿᵢ
             u_trial .+= ΔD
-
+            println("Increment $n, iter $i, ||R|| = ", norm(R)) 
             # 9. Update stresses from committed base + total increment so far
             #    (always restarted from committed so path is consistent)
             trial_states = deepcopy(committed_states)
@@ -81,7 +81,7 @@ function run_simulation_plastic(dh, scheme, mat::LinearElasticMaterial, ch,
                     stress_update!(trial_states[cellid(cell)][qp], Δε, mat, h)
                 end
             end
-
+           
         end  # equilibrium iterations
 
         if !converged
