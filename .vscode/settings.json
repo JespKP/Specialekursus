@@ -1,5 +1,5 @@
 {
-    "julia.environmentPath": "c:\\Users\\Jesper\\OneDrive - Danmarks Tekniske Universitet\\Skrivebord\\Uni\\Kandidat\\Speciale\\Specialekursus",
+    "julia.environmentPath": "c:\\Users\\Jesper\\OneDrive - Danmarks Tekniske Universitet\\Skrivebord\\Uni\\Kandidat\\Speciale\\Specialekursus\\jp_test_package",
     "julia.additionalArgs": [
         "--pkgimages=no"
     ]
