@@ -1,4 +1,4 @@
-using Ferrite, SparseArrays, jp_test_package
+using Ferrite, SparseArrays, SpecialeKursus
 
 function run_example(nx::Int, ny::Int)
     # Geometry and mesh
@@ -13,7 +13,7 @@ function run_example(nx::Int, ny::Int)
     qr = QuadratureRule{RefQuadrilateral}(2)
     qr_face = FacetQuadratureRule{RefQuadrilateral}(1)
 
-    cellvalues = CellValues(qr, ip)s
+    cellvalues = CellValues(qr, ip)
     facetvalues = FacetValues(qr_face, ip)
 
     dh = DofHandler(grid)
@@ -30,7 +30,7 @@ function run_example(nx::Int, ny::Int)
     mat = plane_stress_tensors(E, ν)
 
     # Plastic solver settings
-    total_traction = x -> Vec(0.0, -1.0e3)
+    total_traction = x -> Vec(0.0, -1.0e2)
     n_increments = 100
     h = 100.0
     σ_y0 = 250.0
@@ -47,7 +47,7 @@ function run_example(nx::Int, ny::Int)
         getfacetset(grid, "rightt"),
         facetvalues,
         total_traction;
-        model = :isotropic_hardening,
+        model = :perfect_plasticity,
         n_increments = n_increments,
         h = h,
         σ_y0 = σ_y0
@@ -76,4 +76,6 @@ function run_example(nx::Int, ny::Int)
     return u, all_states, dh, grid
 end
 
-run_example(20,20);
+@time run_example(20,20);
+
+@profview for i in 1:3 run_example(20,20) end

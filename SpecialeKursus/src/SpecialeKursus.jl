@@ -1,4 +1,4 @@
-module jp_test_package
+module SpecialeKursus
 using Ferrite
 using Tensors
 using LinearAlgebra
@@ -60,7 +60,8 @@ include("run_simulation_plastic.jl")
 include("elastoplastic_tangent.jl")
 include("Rint_assembly.jl")
 include("stress_update.jl")
-
+include("assemble_plastic.jl")
+include("material_response.jl")
 
 export PlasticState
 export init_plastic_state
@@ -81,5 +82,7 @@ export run_simulation_material
 export assemble_Rint!
 export stress_update!
 export compute_Cep
+export assemble_plastic!
+export material_response
 
 end # module JespersPackage

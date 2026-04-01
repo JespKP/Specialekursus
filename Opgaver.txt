@@ -1,0 +1,12 @@
+Skriv en nonlineær Newton-Raphson Solver med nonlineære materiale-muligheder, den skal både have almindelig lineær elasticitet, perfekt plasticitet og en eller anden form for hardening law
+
+
+Skriv unit tests for de methods der er - sammenlign resultater med lineær solvers - lav lidt profiling og benchmarking if possible
+
+
+Udregn stresses når du udregner R_int - fix K-matricen, allokér 1 gang uden for load loopet, og så opdater det med K.nzvals, 0.0
+Fix porogrammet - fjern Deepcopy -brug billedet fra tavlen
+
+
+Package tip:
+Runic.jl

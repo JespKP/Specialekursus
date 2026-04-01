@@ -1,6 +1,6 @@
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.12.5"
+julia_version = "1.12.4"
 manifest_format = "2.0"
 project_hash = "671b89857d4f09f3da1fc1c1ab47af05b2fda21b"
 
@@ -136,7 +136,7 @@ uuid = "692b3bcd-3c85-4b1f-b108-f13ce0eb3210"
 version = "1.7.1"
 
 [[deps.JespersPackage]]
-deps = ["Ferrite", "Tensors"]
+deps = ["Ferrite", "LinearAlgebra", "Tensors"]
 path = "."
 uuid = "a1e3d965-d0f2-44da-8efb-760c74c77fed"
 version = "0.1.0"

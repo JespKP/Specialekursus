@@ -13,6 +13,8 @@ function assemble_global!(K, dh, scheme, mat::LinearElasticMaterial)
     end
     return K
 end
+
+
 function assemble_global_plastic!(K, dh, scheme, mat::LinearElasticMaterial,
                                    committed_states, trial_states, h)
     n_basefuncs = getnbasefunctions(get_primary_cv(scheme))
