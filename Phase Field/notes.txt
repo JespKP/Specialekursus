@@ -1,0 +1,4 @@
+Time step convergence study - mesh convergence study - use quadrilateral mesh with full integration(STRUCTURED - NOT UNSTRUCTRUED)
+Second order Quadrilaterals - 
+Save the history variable -  and also save psi  (strain energy density)
+Try different boundary conditions - and if time allows, try shear (paper 2)
